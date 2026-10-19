@@ -1,0 +1,53 @@
+name: Redeploy a verified release
+on:
+  workflow_dispatch:
+    inputs:
+      digest:
+        description: 'Previously verified sha256 image digest (including sha256:)'
+        required: true
+        type: string
+      revision:
+        description: 'Full Git commit SHA baked into that image'
+        required: true
+        type: string
+permissions:
+  contents: read
+jobs:
+  rollback:
+    if: github.ref == 'refs/heads/main' && vars.ENABLE_AWS_DEPLOY == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: production
+    concurrency:
+      group: delivery-production
+      cancel-in-progress: false
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      AWS_REGION: ${{ vars.AWS_REGION }}
+      STATE_BUCKET: ${{ vars.STATE_BUCKET }}
+      STATE_PREFIX: ${{ vars.STATE_PREFIX }}
+      IMAGE_DIGEST: ${{ inputs.digest }}
+      EXPECTED_REVISION: ${{ inputs.revision }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: '1.15.8'
+          terraform_wrapper: false
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+      - run: aws s3 cp "s3://$STATE_BUCKET/$STATE_PREFIX/deployment.json" platform.json
+      - name: Redeploy through Terraform and verify
+        run: python scripts/deploy.py --digest "$IMAGE_DIGEST" --revision "$EXPECTED_REVISION" --state-bucket "$STATE_BUCKET" --state-prefix "$STATE_PREFIX"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rollback-${{ github.run_id }}
+          path: artifacts/release.json
+          if-no-files-found: error

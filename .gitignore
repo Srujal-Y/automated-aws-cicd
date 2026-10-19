@@ -1,0 +1,15 @@
+.venv/
+__pycache__/
+.pytest_cache/
+.terraform/
+*.tfstate*
+*.tfplan
+*.tfvars
+!*.tfvars.example
+*.auto.tfvars.json
+.env
+artifacts/
+platform.json
+*.backend.hcl
+!*.backend.hcl.example
+release.json

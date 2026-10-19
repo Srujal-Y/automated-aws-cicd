@@ -1,0 +1,8 @@
+region = "us-east-1"
+name = "delivery-platform"
+github_repository = "YOUR_ACCOUNT/automated-aws-cicd"
+state_bucket = "YOUR_UNIQUE_STATE_BUCKET"
+state_prefix = "delivery-platform/production"
+# existing_oidc_provider_arn = "arn:aws:iam::123456789012:oidc-provider/token.actions.githubusercontent.com"
+# certificate_arn = "arn:aws:acm:us-east-1:123456789012:certificate/ID"
+# public_hostname = "delivery.example.com"

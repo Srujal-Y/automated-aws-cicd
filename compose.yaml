@@ -1,0 +1,13 @@
+services:
+  app:
+    build:
+      context: ./app
+      args:
+        APP_REVISION: ${APP_REVISION:-local}
+    environment:
+      APP_ENVIRONMENT: local
+    ports: ["127.0.0.1:8090:8000"]
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]

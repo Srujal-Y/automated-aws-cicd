@@ -1,0 +1,6 @@
+* text=auto
+*.py text eol=lf
+*.yml text eol=lf
+*.tf text eol=lf
+*.hcl text eol=lf
+Dockerfile text eol=lf
