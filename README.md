@@ -1,5 +1,7 @@
 # Automated AWS CI/CD Deployment Pipeline
 
+[![Validate and deliver](https://github.com/Srujal-Y/automated-aws-cicd/actions/workflows/delivery.yml/badge.svg)](https://github.com/Srujal-Y/automated-aws-cicd/actions/workflows/delivery.yml)
+
 A commit-to-deployment pipeline for a containerised Python service on ECS Fargate. GitHub Actions tests the application and Terraform, publishes an immutable image to ECR, applies a digest-pinned release, and verifies the running commit through ECS and the application's HTTP endpoint.
 
 **Status:** AWS deployment is disabled by default. Local application, workflow tooling, and infrastructure policy tests can be exercised without an AWS account. Live OIDC authentication, ECR publishing, rolling updates, and rollback need an authorised AWS environment. No AWS resources are created by local validation.
@@ -19,7 +21,8 @@ flowchart LR
 
 ## Engineering highlights
 
-- Pull requests run validation without AWS credentials; only `main` can deliver releases.
+- Pull requests run validation and dependency vulnerability checks without AWS credentials; only `main` can deliver releases.
+- GitHub Actions dependencies are pinned to immutable commit SHAs, with Dependabot configured for update reviews.
 - GitHub OIDC trust is limited to one repository and its production environment. There are no stored AWS access keys.
 - Two Fargate tasks run in private subnets across a two-AZ VPC behind an ALB. Each AZ has a NAT gateway.
 - Terraform owns both infrastructure and service revisions, avoiding a separate deployment tool silently changing Terraform-managed task definitions.
@@ -55,7 +58,7 @@ After installing the Python dependencies below, run `.venv/Scripts/python script
 
 ```powershell
 python -m venv .venv
-./.venv/Scripts/python -m pip install -r app/requirements.txt
+./.venv/Scripts/python -m pip install -r app/requirements.txt -r requirements-dev.txt
 ./.venv/Scripts/python -m unittest discover -s tests -v
 terraform fmt -check -recursive infra
 foreach ($stack in @('state','platform','application')) {
@@ -71,7 +74,7 @@ Terraform tests use a mocked AWS provider and never create real resources. They 
 
 Follow [SETUP.md](docs/SETUP.md) to bootstrap remote state, provision the platform, configure GitHub environment controls, and enable delivery. Follow [OPERATIONS.md](docs/OPERATIONS.md) for rollback, failure diagnosis, and cleanup. See [ARCHITECTURE.md](docs/ARCHITECTURE.md) for ownership boundaries and design trade-offs, and [VERIFICATION.md](docs/VERIFICATION.md) for test scope.
 
-The `.github` directory assumes this folder is the repository root when publishing. This work is independent of the existing Three Tier GitHub repository; no changes to that repository are needed.
+The `.github` directory assumes this folder is the repository root when publishing. This project is maintained separately from the Three Tier platform.
 
 **Cost:** ECR, Fargate, ALB, NAT gateways, public IPv4 addresses, S3, and CloudWatch may incur charges in AWS. Keep `ENABLE_AWS_DEPLOY` unset or `false` for a local/validation-only portfolio. Account credits and service eligibility determine whether a cloud trial costs you money.
 

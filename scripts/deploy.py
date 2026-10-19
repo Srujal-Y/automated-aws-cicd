@@ -51,14 +51,15 @@ def main():
     args = parser.parse_args()
     config = json.loads(Path(args.config).read_text(encoding="utf-8"))
     values = release_variables(config, args.digest, args.revision)
+    artifact_dir = ROOT / "artifacts"
+    artifact_dir.mkdir(exist_ok=True)
+    (artifact_dir / "release.json").unlink(missing_ok=True)
     stack = "-chdir=infra/application"
     run(["terraform", stack, "init", "-input=false", "-reconfigure",
          "-backend-config=bucket=" + args.state_bucket,
          "-backend-config=key=" + args.state_prefix + "/application.tfstate",
          "-backend-config=region=" + config["region"],
          "-backend-config=encrypt=true", "-backend-config=use_lockfile=true"])
-    artifact_dir = ROOT / "artifacts"
-    artifact_dir.mkdir(exist_ok=True)
     variables_file = ROOT / "infra/application/release.auto.tfvars.json"
     variables_file.write_text(json.dumps(values), encoding="utf-8")
     try:

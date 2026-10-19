@@ -16,6 +16,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--skip-containers", action="store_true")
     args = parser.parse_args()
+    run(sys.executable, "-m", "pip_audit", "-r", "app/requirements.txt")
     run(sys.executable, "-m", "unittest", "discover", "-s", "tests", "-v")
     run("terraform", "fmt", "-check", "-recursive", "infra")
     for stack in ("state", "platform", "application"):

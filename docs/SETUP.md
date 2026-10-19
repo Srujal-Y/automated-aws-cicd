@@ -4,7 +4,7 @@ This procedure creates billable AWS infrastructure. It is not required to run lo
 
 ## 1. Publish this folder as its own repository
 
-Use this folder as the Git repository root so `.github/workflows` is recognised. For example, use `Srujal-Y/automated-aws-cicd`. The GitHub repository must match `github_repository` in Terraform. Existing Three Tier infrastructure is not reused.
+Use this folder as the Git repository root so `.github/workflows` is recognised. The project repository is `Srujal-Y/automated-aws-cicd`. The GitHub repository must match `github_repository` in Terraform. Existing Three Tier infrastructure is not reused.
 
 ## 2. Create remote state storage
 

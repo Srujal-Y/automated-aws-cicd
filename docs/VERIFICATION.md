@@ -4,7 +4,7 @@
 
 | Check | Observed result |
 | --- | --- |
-| Python application and delivery tests | 15 passed |
+| Python application and delivery tests | 18 passed |
 | Terraform resource/provider validation | Passed for all three stacks |
 | Terraform formatting | Passed |
 | Mocked Terraform tests | 6 passed: state (1), platform/network (2), application (3) |
@@ -12,6 +12,7 @@
 | Linux Docker image and container health | Passed |
 | HTTP health and baked-in revision smoke check | Passed |
 | Release overview page | HTTP 200 |
+| Python dependency audit | No known vulnerabilities found in the locked application requirements at validation time |
 
 ## Local checks
 
@@ -33,4 +34,4 @@ Commands are in the README. No AWS credentials are needed for mocked Terraform t
 7. Verify permissions deny changes to platform infrastructure and unrelated repositories/state keys.
 8. Confirm cleanup and inspect billing for retained resources.
 
-Local results do not imply that these cloud acceptance checks have passed. GitHub execution is also pending until this folder is published as its own repository and its workflow runs.
+Local results do not imply that these cloud acceptance checks have passed. The repository workflow reports validation separately from the AWS delivery job. A skipped AWS job is not evidence of cloud deployment.
